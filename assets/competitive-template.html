@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{靶点}}竞争布局与突围策略 · {{YYYY-MM-DD}}</title>
+<style>
+  :root{--red:#b8342e;--blue:#1a5276;--ink:#1f2a36;--body:#33414f;--muted:#7a8794;
+    --line:#e6e9ee;--line2:#eef1f4;--bg:#f7f8fa;--card:#ffffff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+  .top{padding-bottom:16px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--red);font-weight:700}
+  h1{font-size:27px;line-height:1.3;margin:6px 0 8px}
+  .sub{font-size:13.5px;color:var(--body);max-width:920px}
+  .meta{font-size:11.5px;color:var(--muted);margin-top:8px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+  .kpi .k{font-size:11px;color:var(--muted)}
+  .kpi .v{font-size:15.5px;font-weight:700;margin-top:2px;line-height:1.35}
+  .toc{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 4px}
+  .toc a{display:inline-flex;gap:5px;text-decoration:none;color:var(--body);background:var(--card);
+    border:1px solid var(--line);border-radius:4px;padding:4px 8px;font-size:12px}
+  .toc span{font-size:10.5px;color:var(--muted);font-weight:700}
+  section{margin-top:34px;scroll-margin-top:12px}
+  .sec-head{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:14px}
+  .sec-no{font-size:12px;font-weight:700;color:var(--red)}
+  h2{font-size:20px;margin:0}
+  .note{margin-left:auto;font-size:11.5px;color:var(--muted);text-align:right}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0}
+  .item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .item-top h3{font-size:15px;margin:0}
+  .tag{font-size:10.5px;padding:1px 6px;border-radius:3px;border:1px solid var(--line)}
+  .t-red{color:var(--red);border-color:#e3b4b1;background:#fdf4f3}
+  .t-blue{color:var(--blue);border-color:#b8cfe0;background:#f2f7fa}
+  .body p{font-size:13.5px;color:var(--body);line-height:1.75;margin:0 0 8px}
+  .judge{margin-top:8px;background:#f6f8fa;border-left:3px solid var(--blue);padding:8px 10px;font-size:13px;line-height:1.7}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--card);margin-top:10px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px}
+  th{background:#f6f8fa;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:8px 10px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--body)}
+  tr:last-child td{border-bottom:none}
+  .table-foot{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.65}
+  .notes{background:#fbfcfd;border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-top:14px}
+  .notes h3{font-size:14px;margin:0 0 6px}
+  .notes ul{margin:0;padding-left:18px}
+  .notes li{font-size:13px;color:var(--body);line-height:1.75;margin-bottom:4px}
+  .warn{border-left:3px solid var(--red);background:#fdf4f3;padding:8px 10px;margin-top:10px;font-size:12.5px;line-height:1.7}
+  .pname{font-weight:600}
+  .pcode{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+  .fig{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto;margin-top:10px}
+  .fig svg{display:block;min-width:820px}
+  .fig-cap{font-size:11.5px;color:var(--muted);margin-top:6px}
+  a{color:var(--blue)}
+  footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.75}
+  @media(max-width:760px){.wrap{padding:20px 14px 44px}h1{font-size:22px}.kpis{grid-template-columns:repeat(2,1fr)}.note{display:none}}
+  @media print{body{background:#fff}.toc{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Competitive Landscape · 竞争布局与突围</div>
+    <h1>{{靶点}}竞争布局与突围策略</h1>
+    <div class="sub">{{一句话结论：竞争格局是什么、从哪个方向切、为什么现在切}}。</div>
+    <div class="meta">数据截至 {{YYYY-MM-DD}} · 来源见第 12 节 · 本看板为竞争策略专项，与日常监控、立项调研相互独立</div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k">直接竞争资产</div><div class="v">{{n}} 项（临床 {{m}} 项）</div></div>
+    <div class="kpi"><div class="k">资本锚点</div><div class="v">{{估值或现金}}</div></div>
+    <div class="kpi"><div class="k">最小竞争方向</div><div class="v">{{方向}}</div></div>
+    <div class="kpi"><div class="k">窗口判断</div><div class="v">{{12–24 个月}}</div></div>
+  </div>
+
+  <nav class="toc">
+    <a href="#m00"><span>00</span>结论与主张</a>
+    <a href="#m01"><span>01</span>竞争全景</a>
+    <a href="#m02"><span>02</span>商业时间轴</a>
+    <a href="#m03"><span>03</span>资本与交易</a>
+    <a href="#m04"><span>04</span>专利布局</a>
+    <a href="#m05"><span>05</span>学术竞争</a>
+    <a href="#m06"><span>06</span>机会评分</a>
+    <a href="#m07"><span>07</span>空白点</a>
+    <a href="#m08"><span>08</span>突围路径</a>
+    <a href="#m09"><span>09</span>能力与资源</a>
+    <a href="#m10"><span>10</span>90 天行动</a>
+    <a href="#m11"><span>11</span>反制与风险</a>
+    <a href="#m12"><span>12</span>方法与来源</a>
+  </nav>
+
+  <!-- ================= 00 ================= -->
+  <section id="m00">
+    <div class="sec-head"><div class="sec-no">00</div><h2>结论与突围主张</h2><div class="note">三条判断 · 一条主张</div></div>
+    <div class="item">
+      <div class="item-top"><h3>判断一：{{…}}</h3><div class="tag t-red">竞争格局</div></div>
+      <div class="body"><p>{{2–3 句，含资产数量、阶段与关键数字}}。</p>
+        <div class="judge"><b>判断：</b>{{可执行的结论}}。</div></div>
+    </div>
+    <div class="item">
+      <div class="item-top"><h3>判断二：{{…}}</h3><div class="tag t-red">空位</div></div>
+      <div class="body"><p>{{…}}</p><div class="judge"><b>判断：</b>{{…}}</div></div>
+    </div>
+    <div class="item">
+      <div class="item-top"><h3>判断三：{{…}}</h3><div class="tag t-blue">学术</div></div>
+      <div class="body"><p>{{…}}</p><div class="judge"><b>判断：</b>{{…}}</div></div>
+    </div>
+    <div class="notes">
+      <h3>突围主张</h3>
+      <p style="font-size:13.5px;color:#33414f;margin:0 0 8px">{{主攻方向 + 首发 + 时间 + 资源比例}}。</p>
+      <div class="warn">{{主张成立的前提，三条以内，必须可观测}}。</div>
+    </div>
+  </section>
+
+  <!-- ================= 01 ================= -->
+  <section id="m01">
+    <div class="sec-head"><div class="sec-no">01</div><h2>竞争全景：四类玩家</h2><div class="note">临床 · 终止 · 早期 · 学术</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1080px">
+        <thead><tr><th>层级</th><th>玩家</th><th>资产与方向</th><th>阶段</th><th>对本案的含义</th></tr></thead>
+        <tbody>
+          <tr><td><b>临床阶段</b></td><td><span class="pname">{{公司}}</span><span class="pcode">{{代号}}</span></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td><b>已终止</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td><b>早期资产</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td><b>学术</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-foot">只计直接靶向资产；专利族与未核实线索不计入临床竞争集；已终止资产必须保留。</div>
+  </section>
+
+  <!-- ================= 02 ================= -->
+  <section id="m02">
+    <div class="sec-head"><div class="sec-no">02</div><h2>商业竞争：资产与时间轴</h2><div class="note">谁先读出数据</div></div>
+    <div class="fig">
+      <svg viewBox="0 0 900 300" role="img" aria-label="资产开发时间轴">
+        <line x1="10" y1="28" x2="890" y2="28" stroke="#e6e9ee"/>
+        <text x="10" y="20" font-size="12" fill="#7a8794">{{年份}}</text>
+        <text x="10" y="58" font-size="12" fill="#1f2a36" font-weight="600">{{资产 A}}</text>
+        <rect x="180" y="46" width="300" height="16" rx="3" fill="#1a5276" opacity="0.85"/>
+        <text x="490" y="58" font-size="11" fill="#1a5276">{{阶段节点}}</text>
+        <line x1="460" y1="28" x2="460" y2="280" stroke="#b8342e" stroke-dasharray="4 3"/>
+        <text x="466" y="280" font-size="11" fill="#b8342e">当前</text>
+      </svg>
+      <div class="fig-cap">图注：深蓝为拮抗或不拥挤方向，红色为拥挤方向，灰色为已终止项目。</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>时间点</th><th>可能事件</th><th>对格局的影响</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= 03 ================= -->
+  <section id="m03">
+    <div class="sec-head"><div class="sec-no">03</div><h2>资本与交易</h2><div class="note">现金 · 估值 · BD</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>主体</th><th>事件</th><th>金额 / 估值</th><th>日期</th><th>解读</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="judge"><b>结论：</b>{{市场在为数据付费还是为平台付费}}。</div>
+    <div class="table-foot">市值不等于企业价值；现金与融资额均标注日期。</div>
+  </section>
+
+  <!-- ================= 04 ================= -->
+  <section id="m04">
+    <div class="sec-head"><div class="sec-no">04</div><h2>专利布局</h2><div class="note">申请人 · 骨架 · 空白</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1040px">
+        <thead><tr><th>申请人</th><th>公开号</th><th>日期</th><th>主题方向</th><th>布局含义</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="judge"><b>结论：</b>{{哪一侧已被占满、哪一侧空白}}。</div>
+    <div class="table-foot">结论限定在可检索范围；未取得公开号的线索标"待核"，不计入 FTO 结论。</div>
+  </section>
+
+  <!-- ================= 05 ================= -->
+  <section id="m05">
+    <div class="sec-head"><div class="sec-no">05</div><h2>学术竞争</h2><div class="note">结构 · 偏向 · 模型</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1060px">
+        <thead><tr><th>机构 / 团队</th><th>成果</th><th>时间</th><th>竞争含义</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{期刊，日期}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="judge"><b>结论：</b>{{谁掌握机制解释权、是否已与产业方联动}}。</div>
+    <div class="table-foot">同一靶点不同方向的结论可能相反，引用时按方向区分。</div>
+  </section>
+
+  <!-- ================= 06 ================= -->
+  <section id="m06">
+    <div class="sec-head"><div class="sec-no">06</div><h2>突围机会评分</h2><div class="note">竞争 35 · 证据 25 · 窗口 25 · 商业 15</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>方向</th><th>竞争密度</th><th>证据可行性</th><th>窗口</th><th>商业价值</th><th>机会分</th><th>判断</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{1–5}}</td><td>{{1–5}}</td><td>{{1–5}}</td><td>{{1–5}}</td><td><b>{{…}}</b></td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">竞争密度为逆向计分；分差 &lt;0.3 视为无实质差异；机会分不替代实验判断。</div>
+    <div class="notes">
+      <h3>读法</h3>
+      <ul><li>{{解释商业分最高但加权垫底的方向，避免读者误读}}</li></ul>
+    </div>
+  </section>
+
+  <!-- ================= 07 ================= -->
+  <section id="m07">
+    <div class="sec-head"><div class="sec-no">07</div><h2>空白点</h2><div class="note">机制 · 适应症 · 模态 · 区域 · 联合</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>空白类型</th><th>具体位置</th><th>证据</th><th>可占性</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{高/中/低 + 理由}}</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= 08 ================= -->
+  <section id="m08">
+    <div class="sec-head"><div class="sec-no">08</div><h2>四条突围路径</h2><div class="note">主攻 · 扩展 · 跟随 · 期权</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1040px">
+        <thead><tr><th>路径</th><th>打法</th><th>优势</th><th>关键风险</th><th>所需首个证据</th></tr></thead>
+        <tbody>
+          <tr><td><b>A 主攻</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td><b>B 扩展</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td><b>C 跟随</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td><b>D 期权</b></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{无需近期证据}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="item">
+      <div class="item-top"><h3>资源配置</h3><div class="tag t-red">7:2:1</div></div>
+      <div class="body"><p>{{说明为什么不能四条并行}}。</p>
+        <div class="judge"><b>判断：</b>{{资源与阶段门的对应关系}}。</div></div>
+    </div>
+  </section>
+
+  <!-- ================= 09 ================= -->
+  <section id="m09">
+    <div class="sec-head"><div class="sec-no">09</div><h2>突围所需能力</h2><div class="note">现状 · 缺口 · 补齐</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>能力</th><th>现状判断</th><th>缺口</th><th>补齐方式</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{内部/合作/外包}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">指出哪一两项缺口决定时间表，其余可外部补齐。</div>
+  </section>
+
+  <!-- ================= 10 ================= -->
+  <section id="m10">
+    <div class="sec-head"><div class="sec-no">10</div><h2>90 天行动</h2><div class="note">三阶段 · 阶段门</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>阶段</th><th>动作</th><th>产出</th><th>停止条件</th></tr></thead>
+        <tbody>
+          <tr><td>0–30 天</td><td>{{…}}</td><td>{{…}}</td><td>{{可观测条件}}</td></tr>
+          <tr><td>31–60 天</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+          <tr><td>61–90 天</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warn">目标是用最低成本回答「是否值得继续」；停止条件触发即停，不以优化方案替代决策。</div>
+  </section>
+
+  <!-- ================= 11 ================= -->
+  <section id="m11">
+    <div class="sec-head"><div class="sec-no">11</div><h2>对手反制与风险</h2><div class="note">动作 · 触发 · 影响 · 预案</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1020px">
+        <thead><tr><th>对手动作</th><th>触发条件</th><th>影响</th><th>预案</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">反制预案依赖持续监测，写明监测频率与负责职能。</div>
+  </section>
+
+  <!-- ================= 12 ================= -->
+  <section id="m12">
+    <div class="sec-head"><div class="sec-no">12</div><h2>方法与来源</h2><div class="note">可复核</div></div>
+    <div class="notes">
+      <h3>口径说明</h3>
+      <ul>
+        <li>竞争集只计直接靶向资产；专利族与未核实线索不计入。</li>
+        <li>机会分权重：竞争 35%、证据 25%、窗口 25%、商业 15%；竞争为逆向计分。</li>
+        <li>市值、现金、融资额均标注日期；市值不等于企业价值。</li>
+      </ul>
+    </div>
+    <div class="notes">
+      <h3>来源清单</h3>
+      <ul><li><a href="{{URL}}">{{标题或机构}}，{{YYYY-MM-DD}}</a></li></ul>
+    </div>
+  </section>
+
+  <footer>
+    本看板为竞争策略专项，与日常资讯监控、立项调研看板相互独立，不触发邮件发送。所有数字标注来源与日期；机会分为内部排序工具，不构成估值结论。
+  </footer>
+
+</div>
+</body>
+</html>
