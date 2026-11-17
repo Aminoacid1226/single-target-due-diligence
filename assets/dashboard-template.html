@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{靶点}}靶点立项调研看板 · {{YYYY-MM-DD}}</title>
+<style>
+  :root{
+    --red:#b8342e; --blue:#1a5276;
+    --ink:#1f2a36; --body:#33414f; --muted:#7a8794;
+    --line:#e6e9ee; --line2:#eef1f4; --bg:#f7f8fa; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    font-size:14px;line-height:1.6;-webkit-text-size-adjust:100%}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+  .top{padding-bottom:16px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-size:11.5px;letter-spacing:.12em;color:var(--red);font-weight:700;text-transform:uppercase}
+  h1{font-size:27px;line-height:1.3;margin:6px 0 8px;letter-spacing:-.01em}
+  .sub{font-size:13.5px;color:var(--body);max-width:900px}
+  .meta{font-size:11.5px;color:var(--muted);margin-top:8px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+  .kpi .k{font-size:11px;color:var(--muted)}
+  .kpi .v{font-size:15.5px;font-weight:700;margin-top:2px;line-height:1.35}
+
+  .toc{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 4px}
+  .toc a{display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:var(--body);
+    background:var(--card);border:1px solid var(--line);border-radius:4px;padding:4px 8px;font-size:12px}
+  .toc a:hover{border-color:var(--blue);color:var(--blue)}
+  .toc span{font-size:10.5px;color:var(--muted);font-weight:700}
+
+  section{margin-top:34px;scroll-margin-top:12px}
+  .sec-head{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:14px}
+  .sec-no{font-size:12px;font-weight:700;color:var(--red);letter-spacing:.06em}
+  h2{font-size:20px;margin:0;letter-spacing:-.01em}
+  .note{margin-left:auto;font-size:11.5px;color:var(--muted);text-align:right}
+
+  .item{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0}
+  .item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .item-top h3{font-size:15px;margin:0}
+  .tag{font-size:10.5px;padding:1px 6px;border-radius:3px;border:1px solid var(--line);white-space:nowrap}
+  .t-red{color:var(--red);border-color:#e3b4b1;background:#fdf4f3}
+  .t-blue{color:var(--blue);border-color:#b8cfe0;background:#f2f7fa}
+  .body p{font-size:13.5px;color:var(--body);line-height:1.75;margin:0 0 8px}
+  .judge{margin-top:8px;background:#f6f8fa;border-left:3px solid var(--blue);padding:8px 10px;font-size:13px;line-height:1.7}
+  .judge b{color:var(--ink)}
+
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--card);margin-top:10px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px}
+  th{background:#f6f8fa;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:600}
+  td{padding:8px 10px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--body)}
+  tr:last-child td{border-bottom:none}
+  td b,td strong{color:var(--ink)}
+  .table-foot{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.65}
+
+  .notes{background:#fbfcfd;border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-top:14px}
+  .notes h3{font-size:14px;margin:0 0 6px}
+  .notes ul{margin:0;padding-left:18px}
+  .notes li{font-size:13px;color:var(--body);line-height:1.75;margin-bottom:4px}
+  .warn{border-left:3px solid var(--red);background:#fdf4f3;padding:8px 10px;margin-top:10px;font-size:12.5px;line-height:1.7}
+
+  .pname{font-weight:600;color:var(--ink)}
+  .pcode{display:block;color:var(--muted);font-size:11.5px;font-weight:400;margin-top:1px}
+
+  .fig{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto}
+  .fig svg{display:block;min-width:760px}
+
+  a{color:var(--blue)}
+  footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.75}
+
+  @media (max-width:760px){
+    .wrap{padding:20px 14px 44px}
+    h1{font-size:22px}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .note{display:none}
+    .fig svg{min-width:640px}
+  }
+  @media print{
+    body{background:#fff}
+    .toc{display:none}
+    section{page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Target Due Diligence · 立项级调研</div>
+    <h1>{{靶点}}靶点立项调研看板</h1>
+    <div class="sub">{{一句话结论：能否立项、走哪条路径、首发适应症、当前阶段}}。</div>
+    <div class="meta">数据截至 {{YYYY-MM-DD}} · 来源见第 14 节 · 本报告为一次性立项调研，不参与日常监控</div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k">靶点验证等级</div><div class="v">{{T1–T4}}</div></div>
+    <div class="kpi"><div class="k">直接竞争资产</div><div class="v">{{n}} 项</div></div>
+    <div class="kpi"><div class="k">最高临床阶段</div><div class="v">{{阶段}}</div></div>
+    <div class="kpi"><div class="k">时间窗口</div><div class="v">{{窗口}}</div></div>
+  </div>
+
+  <nav class="toc">
+    <a href="#m00"><span>00</span>摘要与结论</a>
+    <a href="#m01"><span>01</span>生物学与验证</a>
+    <a href="#m02"><span>02</span>适应症地图</a>
+    <a href="#m03"><span>03</span>模态与可成药性</a>
+    <a href="#m04"><span>04</span>竞争格局</a>
+    <a href="#m05"><span>05</span>临床与监管</a>
+    <a href="#m06"><span>06</span>专利与 IP</a>
+    <a href="#m07"><span>07</span>化学与 SAR</a>
+    <a href="#m08"><span>08</span>药理与转化</a>
+    <a href="#m09"><span>09</span>开发性与 TPP</a>
+    <a href="#m10"><span>10</span>交易与估值</a>
+    <a href="#m11"><span>11</span>立项决策</a>
+    <a href="#m12"><span>12</span>计划与价值</a>
+    <a href="#m13"><span>13</span>风险登记册</a>
+    <a href="#m14"><span>14</span>方法与附录</a>
+  </nav>
+
+  <!-- ================= 00 ================= -->
+  <section id="m00">
+    <div class="sec-head"><div class="sec-no">00</div><h2>摘要与立项结论</h2><div class="note">结论先行 · 每条标注支撑章节</div></div>
+
+    <div class="item">
+      <div class="item-top"><h3>结论一：{{判断}}</h3><div class="tag t-red">核心结论</div></div>
+      <div class="body">
+        <p>{{2–4 句，含关键数字与来源}}。</p>
+        <div class="judge"><b>判断：</b>{{可执行的下一步动作与判断依据}}。</div>
+      </div>
+    </div>
+
+    <!-- 结论二、结论三同上 -->
+
+    <div class="notes">
+      <h3>前置条件（未满足则不进入下一阶段）</h3>
+      <ul>
+        <li>{{条件 1，含数字门槛}}</li>
+        <li>{{条件 2}}</li>
+        <li>{{条件 3}}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= 01 ================= -->
+  <section id="m01">
+    <div class="sec-head"><div class="sec-no">01</div><h2>靶点生物学与验证等级</h2><div class="note">机制 · 人体证据强度</div></div>
+    <div class="fig">{{内联 SVG 通路图，含配体、受体、下游与已有干预方向}}</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>维度</th><th>证据</th><th>评分（1–5）</th><th>来源</th></tr></thead>
+        <tbody>
+          <tr><td>人类遗传学</td><td>{{…}}</td><td>{{…}}</td><td><a href="{{URL}}">{{来源}}</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{评分口径见第 14 节；靶点级等级与路径级分数不可比较。}}</div>
+  </section>
+
+  <!-- ================= 02 ================= -->
+  <section id="m02">
+    <div class="sec-head"><div class="sec-no">02</div><h2>适应症地图与优先级</h2><div class="note">市场 · 需求 · 终点 · 热度</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>适应症</th><th>患者规模</th><th>未满足需求</th><th>终点</th><th>竞争</th><th>加权分</th></tr></thead>
+        <tbody>
+          <tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{权重与分值锚点见第 14 节；竞争口径见第 04 节。}}</div>
+  </section>
+
+  <!-- ================= 03 ================= -->
+  <section id="m03">
+    <div class="sec-head"><div class="sec-no">03</div><h2>模态选择与可成药性</h2><div class="note">激动 / 拮抗 · 小分子 / 肽 / 抗体</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>方向</th><th>机制依据</th><th>体内外证据</th><th>风险</th><th>本团队适配</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h3>可成药性风险清单</h3>
+      <ul><li>{{风险与前置判据}}</li></ul>
+    </div>
+  </section>
+
+  <!-- ================= 04 ================= -->
+  <section id="m04">
+    <div class="sec-head"><div class="sec-no">04</div><h2>竞争格局与管线全景</h2><div class="note">谁在做 · 到哪一步 · 窗口多长</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1080px">
+        <thead><tr><th>公司/机构</th><th>资产</th><th>方向</th><th>阶段</th><th>最新节点</th><th>来源</th></tr></thead>
+        <tbody><tr><td><span class="pname">{{名称}}</span><span class="pcode">{{代号}}</span></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td><a href="{{URL}}">{{日期}}</a></td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{计数口径：仅计入直接靶向资产；专利族与待核线索单列，不计入竞争集。}}</div>
+  </section>
+
+  <!-- ================= 05 ================= -->
+  <section id="m05">
+    <div class="sec-head"><div class="sec-no">05</div><h2>临床与监管证据</h2><div class="note">已有什么数据 · 监管怎么走</div></div>
+    <div class="table-wrap">
+      <table style="min-width:980px">
+        <thead><tr><th>资产</th><th>注册号</th><th>期别</th><th>样本量</th><th>终点</th><th>状态</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h3>失败复盘与终点基准</h3>
+      <ul><li>{{失败原因、可迁移教训、外部疗效基准}}</li></ul>
+      <div class="warn">{{安全性数据不得表述为疗效；终点基准只作参照，项目目标值见第 09 节。}}</div>
+    </div>
+  </section>
+
+  <!-- ================= 06 ================= -->
+  <section id="m06">
+    <div class="sec-head"><div class="sec-no">06</div><h2>专利与 IP 版图</h2><div class="note">壁垒 · 可绕行空间 · FTO</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>公开号</th><th>申请人</th><th>优先权日</th><th>主题</th><th>法律状态</th><th>核验</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{已核验 / 待核}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{结论限定为"在已检索范围内"；未取得公开号的线索单列待核，不计入 FTO 结论。}}</div>
+  </section>
+
+  <!-- ================= 07 ================= -->
+  <section id="m07">
+    <div class="sec-head"><div class="sec-no">07</div><h2>化学物质与 SAR</h2><div class="note">化学起点 · 活性量级 · 分子性质目标</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>化合物</th><th>方向</th><th>活性</th><th>选择性 / 偏向</th><th>阶段</th><th>局限</th></tr></thead>
+        <tbody><tr><td><span class="pname">{{名称}}</span><span class="pcode">{{骨架说明}}</span></td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h3>分子性质目标</h3>
+      <ul><li>{{参数与阈值，标注为行业经验区间}}</li></ul>
+    </div>
+  </section>
+
+  <!-- ================= 08 ================= -->
+  <section id="m08">
+    <div class="sec-head"><div class="sec-no">08</div><h2>药理评价体系与转化</h2><div class="note">体外级联 · 体内模型 · 转化风险</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>层级</th><th>实验</th><th>目的</th><th>判读标准</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>体内模型</th><th>适应症</th><th>读数</th><th>限制</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h3>关键实验优先级</h3>
+      <ul><li>{{实验、决策用途、终止标准}}</li></ul>
+    </div>
+  </section>
+
+  <!-- ================= 09 ================= -->
+  <section id="m09">
+    <div class="sec-head"><div class="sec-no">09</div><h2>开发性评估与目标产品特征</h2><div class="note">定量 TPP · 成本结构 · 竞品差距</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1020px">
+        <thead><tr><th>TPP 参数</th><th>目标值</th><th>设定依据</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{可测量阈值}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{未达到核心三项者不得进入 IND-enabling；基准读数见第 05 节。}}</div>
+  </section>
+
+  <!-- ================= 10 ================= -->
+  <section id="m10">
+    <div class="sec-head"><div class="sec-no">10</div><h2>交易、估值与资本动向</h2><div class="note">市场给什么价</div></div>
+    <div class="table-wrap">
+      <table style="min-width:960px">
+        <thead><tr><th>公司</th><th>事件</th><th>金额 / 估值</th><th>日期</th><th>来源</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td><a href="{{URL}}">{{来源}}</a></td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{市值不等于企业价值；跨阶段交易不可直接套用倍数。}}</div>
+  </section>
+
+  <!-- ================= 11 ================= -->
+  <section id="m11">
+    <div class="sec-head"><div class="sec-no">11</div><h2>立项决策矩阵</h2><div class="note">路径评分 · 决策卡 · 闸门</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>路径</th><th>科学证据</th><th>可成药性</th><th>竞争位置</th><th>IP 空间</th><th>加权分</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-foot">{{权重见第 14 节；靶点级等级与路径级分数是两套口径。}}</div>
+  </section>
+
+  <!-- ================= 12 ================= -->
+  <section id="m12">
+    <div class="sec-head"><div class="sec-no">12</div><h2>开发计划、资源与价值量化</h2><div class="note">阶段门 · 配置 · 峰值与 rNPV</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>阶段</th><th>关键交付</th><th>决策门</th><th>相对时点</th></tr></thead>
+        <tbody><tr><td>{{S0–S5}}</td><td>{{…}}</td><td>{{可判定门槛}}</td><td>{{T0 + n 个月}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h3>峰值销售与 rNPV 框架</h3>
+      <p style="font-size:13.5px;color:#33414f">峰值 = 患者数 × 诊断率 × 可治疗率 × 渗透率 × 年费用。{{列出全部假设}}。</p>
+      <div class="warn">{{参数化推演，不是估值结论；假设需一手调研校验。}}</div>
+    </div>
+  </section>
+
+  <!-- ================= 13 ================= -->
+  <section id="m13">
+    <div class="sec-head"><div class="sec-no">13</div><h2>风险登记册</h2><div class="note">概率 · 影响 · 缓解 · 监测</div></div>
+    <div class="table-wrap">
+      <table style="min-width:1000px">
+        <thead><tr><th>风险</th><th>概率</th><th>影响</th><th>缓解措施</th><th>监测指标</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{高/中/低}}</td><td>{{高/中/低}}</td><td>{{对应第 11 节闸门}}</td><td>{{可观测指标}}</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= 14 ================= -->
+  <section id="m14">
+    <div class="sec-head"><div class="sec-no">14</div><h2>方法、数据缺口与来源</h2><div class="note">可复核 · 可复现</div></div>
+    <div class="notes">
+      <h3>检索策略与证据等级</h3>
+      <ul>
+        <li>检索日期与数据库：{{…}}</li>
+        <li>证据等级：A 监管/原始披露；B 指南/综述/会议摘要；C 二手索引；D 市场估算。</li>
+      </ul>
+    </div>
+    <div class="table-wrap">
+      <table style="min-width:960px">
+        <thead><tr><th>数据缺口</th><th>影响</th><th>补齐方式</th></tr></thead>
+        <tbody><tr><td>{{…}}</td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <h3>来源清单</h3>
+      <ul>
+        <li><a href="{{URL}}">{{标题或机构}}，{{YYYY-MM-DD}}</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    本报告为一次性立项级调研，与日常资讯监控任务相互独立，不触发邮件发送。所有数字均标注来源与日期；未核实线索已单列。评分权重与分值锚点见第 14 节。
+  </footer>
+
+</div>
+</body>
+</html>
